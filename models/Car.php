@@ -19,7 +19,9 @@ class Car{
                     echo json_encode($rows, JSON_UNESCAPED_UNICODE);
                 }
             break;
-            default: break;
+            default: 
+                echo '{"message": "invalid request method"}';
+            break;
         }
     }
 }

@@ -2,6 +2,8 @@
     require_once "./config/conn.php";
     require_once "./models/Car.php";
     require_once "./models/User.php";
+    require_once "./models/Rent.php";
+    require_once "./models/Contact.php";
 
     function router(){
         $uri = $_SERVER['REQUEST_URI'];
@@ -24,13 +26,14 @@
             break;
             case "/carRentalAPI/contact":
             case "/carRentalAPI/contact/":
+                Contact::handle();
             break;
             case "/carRentalAPI/rent":
             case "/carRentalAPI/rent/":
+                Rent::handle();
             break;
-            case "/carRentalAPI/user":
-            case "/carRentalAPI/user/":
-            break;
+            default:
+                include("./config/404.php");
         }
     }
 

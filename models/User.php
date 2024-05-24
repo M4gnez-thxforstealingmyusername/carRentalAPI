@@ -28,52 +28,65 @@
 
                         User::startSession($email);
 
-                        echo json_encode('{logged: "logged as '.$email.'"}', JSON_UNESCAPED_UNICODE);
+                        echo '{"message": "logged as '.$email.'"}';
                     }
                     else
-                        echo json_encode('{logged: "email already used"}', JSON_UNESCAPED_UNICODE);
+                        echo '{"message": "email already used"}';
                 }
                 else
-                    echo json_encode('{logged: "insufficient form data"}', JSON_UNESCAPED_UNICODE);
+                    echo '{"message": "insufficient form data"}';
             }
             else
-                echo json_encode('{logged: "invalid request method"}', JSON_UNESCAPED_UNICODE);
+                echo '{"message": "invalid request method"}';
         }
 
         public static function login(){
-            include "./config/conn.php";
-            $email = $_POST["email"];
-            $password = $_POST["password"];
+            if($_SERVER["REQUEST_METHOD"] == "POST")
+            {
 
-            $sql = "SELECT * FROM user WHERE email = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param('s', $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
+                if(isset($_POST["email"]) && isset($_POST["password"])){
+                    include "./config/conn.php";
+                    $email = $_POST["email"];
+                    $password = $_POST["password"];
 
-            if($result->num_rows > 0){
-                while($row = $result->fetch_assoc()){
-                    if(password_verify($password, $row["password"]))
-                    {
-                        User::startSession($email);
+                    $sql = "SELECT * FROM user WHERE email = ?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param('s', $email);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
 
-                        echo json_encode('{logged: "logged as '.$email.'"}', JSON_UNESCAPED_UNICODE);
+                    if($result->num_rows > 0){
+                        while($row = $result->fetch_assoc()){
+                            if(password_verify($password, $row["password"]))
+                            {
+                                User::startSession($email);
+
+                                echo '{"message": "logged as '.$email.'"}';
+                            }
+                            else
+                                echo '{"message": "password incorrect"}';
+                        }
                     }
                     else
-                        echo json_encode('{logged: "password incorrect"}', JSON_UNESCAPED_UNICODE);
-                    echo $row["email"];
-                    echo $password;
+                        echo '{"message": "user not found"}';
                 }
+                else
+                    echo '{"message": "insufficient form data"}';
             }
             else
-                echo json_encode('{logged: "user not found"}', JSON_UNESCAPED_UNICODE);
+                echo '{"message": "invalid request method"}';
         }
 
         public static function logout(){
-            session_start();
-            unset($_SESSION["user"]);
-            session_destroy();
-            echo json_encode('{logged: "logged out"');
+            if($_SERVER["REQUEST_METHOD"] == "POST")
+            {
+                session_start();
+                unset($_SESSION["user"]);
+                session_destroy();
+                echo '{"message": "logged out"}';
+            }
+            else
+                echo '{"message": "invalid request method"}';
         }
 
         private static function getOne($email){
