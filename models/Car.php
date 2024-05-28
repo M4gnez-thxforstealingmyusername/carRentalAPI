@@ -14,7 +14,7 @@ class Car{
 
                 if($result->num_rows > 0)
                 {
-                    $rows = mysqli_fetch_all($result);
+                    $rows = $result->fetch_all(MYSQLI_ASSOC);
 
                     echo json_encode($rows, JSON_UNESCAPED_UNICODE);
                 }

@@ -9,7 +9,8 @@
         public static function register(){
             if($_SERVER["REQUEST_METHOD"] == "POST")
             {
-
+                $_POST = json_decode(file_get_contents('php://input'), true);
+                error_log(print_r($_POST, true));
                 if(isset($_POST["name"]) && isset($_POST["lastName"]) && isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["phone"])){
                     $name = $_POST["name"];
                     $lastName = $_POST["lastName"];
@@ -34,7 +35,7 @@
                         echo '{"message": "email already used"}';
                 }
                 else
-                    echo '{"message": "insufficient form data"}';
+                echo '{"message": "insufficient form data"}';
             }
             else
                 echo '{"message": "invalid request method"}';
@@ -44,6 +45,7 @@
             if($_SERVER["REQUEST_METHOD"] == "POST")
             {
 
+                $_POST = json_decode(file_get_contents('php://input'), true);
                 if(isset($_POST["email"]) && isset($_POST["password"])){
                     include "./config/conn.php";
                     $email = $_POST["email"];
@@ -61,7 +63,7 @@
                             {
                                 User::startSession($email);
 
-                                echo '{"message": "logged as '.$email.'"}';
+                                echo '{"message": "logged as '.$email.'", "logged": true}';
                             }
                             else
                                 echo '{"message": "password incorrect"}';
@@ -105,6 +107,35 @@
                 return $row["id"];
             }
             else return 0;
+        }
+
+        public static function get(){
+            if($_SERVER["REQUEST_METHOD"] == "GET")
+            {
+                session_start();
+                if(isset($_SESSION["user"])){
+                    include "./config/conn.php";
+
+                    $sql = "SELECT id, name, lastName, email, phone FROM user WHERE id = ?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("s", $_SESSION["user"]);
+                    $stmt->execute();
+
+                    $result = $stmt->get_result();
+
+                    if($result->num_rows > 0)
+                    {
+                        $rows = $result->fetch_assoc();
+
+                        echo json_encode($rows, JSON_UNESCAPED_UNICODE);
+                    }
+                }
+                else{
+                    echo '{"message": "no user logged in"}';
+                }
+            }
+            else
+                echo '{"message": "invalid request method"}';
         }
     }
 ?>

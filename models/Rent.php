@@ -3,6 +3,7 @@
         public static function handle(){
             switch($_SERVER["REQUEST_METHOD"]){
                 case "POST":
+                    $_POST = json_decode(file_get_contents('php://input'), true);
                     if(isset($_POST["carId"]) && isset($_POST["startDate"]) && isset($_POST["endDate"])){
                         session_start();
                         if(isset($_SESSION["user"])){
@@ -27,20 +28,17 @@
                 case "GET":
                     session_start();
                     if(isset($_SESSION["user"])){
-                        $userId = $_SESSION["user"];
-
                         include "./config/conn.php";
 
-                        $sql = "SELECT * FROM rent WHERE userId = ?";
+                        $sql = "SELECT * FROM rent";
                         $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $userId);
                         $stmt->execute();
 
                         $result = $stmt->get_result();
 
                         if($result->num_rows > 0)
                         {
-                            $rows = mysqli_fetch_row($result);
+                            $rows = $result->fetch_all(MYSQLI_ASSOC);
 
                             echo json_encode($rows, JSON_UNESCAPED_UNICODE);
                         }
@@ -49,7 +47,7 @@
                         echo '{"message": "no user logged in"}';
                 }
                 break;
-                default: 
+                default:
                     echo '{"message": "invalid request method"}';
                 break;
             }
