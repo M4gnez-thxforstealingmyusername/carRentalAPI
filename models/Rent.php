@@ -55,7 +55,7 @@
 
                         $startDate = $_POST["startDate"];
                         $endDate = $_POST["endDate"];
-                        $rentId = $_POST["rentId"];
+                        $rentId = $_POST["id"];
 
                         $sql = "UPDATE `rent` SET `startDate` = ?, `endDate` = ? WHERE `rent`.`id` = ?";
                         $stmt = $conn->prepare($sql);
@@ -72,7 +72,7 @@
                     if(isset($_SESSION["user"])){
                         include "./config/conn.php";
 
-                        $rentId = $_POST["rentId"];
+                        $rentId = $_POST["id"];
 
                         $sql = "DELETE FROM `rent` WHERE `rent`.`id` = ?";
                         $stmt = $conn->prepare($sql);
