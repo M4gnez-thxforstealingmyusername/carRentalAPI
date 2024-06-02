@@ -47,6 +47,42 @@
                         echo '{"message": "no user logged in"}';
                 }
                 break;
+                case "PUT":
+                    $_POST = json_decode(file_get_contents('php://input'), true);
+                    session_start();
+                    if(isset($_SESSION["user"])){
+                        include "./config/conn.php";
+
+                        $startDate = $_POST["startDate"];
+                        $endDate = $_POST["endDate"];
+                        $rentId = $_POST["rentId"];
+
+                        $sql = "UPDATE `rent` SET `startDate` = ?, `endDate` = ? WHERE `rent`.`id` = ?";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("ssi", $startDate, $endDate, $rentId);
+                        $stmt->execute();
+
+                    }
+                    else
+                        echo '{"message": "no user logged in"}';
+                break;
+                case "DELETE":
+                    $_POST = json_decode(file_get_contents('php://input'), true);
+                    session_start();
+                    if(isset($_SESSION["user"])){
+                        include "./config/conn.php";
+
+                        $rentId = $_POST["rentId"];
+
+                        $sql = "DELETE FROM `rent` WHERE `rent`.`id` = ?";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("i", $rentId);
+                        $stmt->execute();
+
+                    }
+                    else
+                        echo '{"message": "no user logged in"}';
+                break;
                 default:
                     echo '{"message": "invalid request method"}';
                 break;
